@@ -1,0 +1,20 @@
+{
+  "key.category.blockutility": "Block Utility",
+  "key.blockutility.toggle_custom_place": "Toggle Custom Place Delay",
+  "key.blockutility.toggle_custom_break": "Toggle Custom Break Delay",
+  "key.blockutility.toggle_direction_lock": "Toggle Directional Lock",
+  "message.blockutility.custom_break": "Custom break delay: %s",
+  "message.blockutility.custom_place": "Custom place delay: %s",
+  "message.blockutility.direction_locked": "Direction lock: %s",
+  "message.blockutility.enabled": "Enabled",
+  "message.blockutility.disabled": "Disabled",
+  "blockutility.configuration.place_delay": "Custom Place Delay",
+  "blockutility.configuration.break_delay": "Custom Break Delay",
+  "blockutility.configuration.block_outline": "Block Outline",
+  "blockutility.configuration.enabled": "Enabled",
+  "blockutility.configuration.width": "Width",
+  "blockutility.configuration.alpha": "Alpha",
+  "blockutility.configuration.red": "Red",
+  "blockutility.configuration.green": "Green",
+  "blockutility.configuration.blue": "Blue"
+}
