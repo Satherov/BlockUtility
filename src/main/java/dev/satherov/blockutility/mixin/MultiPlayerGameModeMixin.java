@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,6 +26,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.time.Instant;
 
 @Mixin(MultiPlayerGameMode.class)
 public class MultiPlayerGameModeMixin {
@@ -65,11 +68,36 @@ public class MultiPlayerGameModeMixin {
     }
     
     @Inject(
+            method = "continueDestroyBlock",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;destroyDelay:I",
+                    opcode = Opcodes.PUTFIELD,
+                    shift = At.Shift.AFTER
+            )
+    )
+    public void afterDestroyDelayDecrement(BlockPos posBlock, Direction directionFacing, CallbackInfoReturnable<Boolean> cir) {
+        BlockUtilityClient.setDelay(this.destroyDelay);
+        BlockUtilityClient.setLast(Instant.now().getEpochSecond());
+    }
+    
+    @Inject(
+            method = "continueDestroyBlock",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"
+            )
+    )
+    public void modifyBreakDelay(BlockPos posBlock, Direction directionFacing, CallbackInfoReturnable<Boolean> cir) {
+        if (BlockUtilityClient.isCustomBreak()) this.destroyDelay = BlockUtilityConfig.Client.getBreakDelay();
+    }
+    
+    @Inject(
             method = "startDestroyBlock",
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;isDestroying:Z",
-                    opcode = org.objectweb.asm.Opcodes.GETFIELD,
+                    opcode = Opcodes.GETFIELD,
                     ordinal = 1,
                     shift = At.Shift.BEFORE
             ),
@@ -80,9 +108,7 @@ public class MultiPlayerGameModeMixin {
                     )
             )
     )
-    public void modifyBreakDelay(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
-        if (BlockUtilityClient.isCustomBreak()) this.destroyDelay = BlockUtilityConfig.Client.getBreakDelay();
-        
+    public void setOptimalTool(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
         if (BlockUtilityConfig.Client.isOptimalToolFinder()) {
             Player player = minecraft.player;
             Level level = minecraft.level;

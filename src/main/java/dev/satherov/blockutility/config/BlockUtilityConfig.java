@@ -27,6 +27,19 @@ public class BlockUtilityConfig {
         @ConfigVal.Integer(min = 0, max = 200)
         private static @Getter @Setter int breakDelay = 4;
         
+        @ConfigVal(name = "break_display", comment = """
+                Show the time in ticks remaining until another block can be broken in the hud.
+                This only shows up if break_delay is greater than 20.
+                """)
+        @ConfigVal.Boolean
+        private static @Getter @Setter boolean breakDisplay = true;
+        
+        @ConfigVal(name = "info_display", comment = """
+                Shows the active settings in the top left corner
+                """)
+        @ConfigVal.Boolean
+        private static @Getter @Setter boolean infoDisplay = true;
+        
         @ConfigVal(name = "optimal_tool_finder", comment = "Automatically scroll to best tool in the hotbar for the current block")
         @ConfigVal.Boolean
         private static @Getter @Setter boolean optimalToolFinder = true;
