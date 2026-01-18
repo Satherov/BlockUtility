@@ -2,71 +2,24 @@ package dev.satherov.blockutility.mixin;
 
 import dev.satherov.blockutility.config.BlockUtilityConfig;
 
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
-
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(value = LevelRenderer.class, priority = 1100)
 public class LevelRendererMixin {
     
-    @Shadow
-    private ClientLevel level;
-    
-    /**
-     * @author Satherov
-     * @reason Custom Block Outline Rendering
-     */
-    @Overwrite
-    private void renderHitOutline(
-            PoseStack poseStack,
-            VertexConsumer consumer,
-            Entity entity,
-            double camX,
-            double camY,
-            double camZ,
-            BlockPos pos,
-            BlockState state
-    ) {
-        final float a = ((float) BlockUtilityConfig.Client.Outline.getAlpha() / 255);
-        final float r = ((float) BlockUtilityConfig.Client.Outline.getRed() / 255);
-        final float g = ((float) BlockUtilityConfig.Client.Outline.getGreen() / 255);
-        final float b = ((float) BlockUtilityConfig.Client.Outline.getBlue() / 255);
-        
-        renderShape(
-                poseStack,
-                consumer,
-                state.getShape(this.level, pos, CollisionContext.of(entity)),
-                (double) pos.getX() - camX,
-                (double) pos.getY() - camY,
-                (double) pos.getZ() - camZ,
-                r, g, b, a
-        );
-    }
-    
-    @Shadow
-    private static void renderShape(
-            PoseStack poseStack,
-            VertexConsumer consumer,
-            VoxelShape shape,
-            double x,
-            double y,
-            double z,
-            float red,
-            float green,
-            float blue,
-            float alpha
-    ) {
-        throw new AssertionError();
+    @ModifyArgs(
+            method = "renderHitOutline",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderShape(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/phys/shapes/VoxelShape;DDDFFFF)V")
+    )
+    private void modifyOutlineColor(Args args) {
+        args.set(6, (float) BlockUtilityConfig.Client.Outline.getRed() / 255);   // red
+        args.set(7, (float) BlockUtilityConfig.Client.Outline.getGreen() / 255); // green
+        args.set(8, (float) BlockUtilityConfig.Client.Outline.getBlue() / 255);  // blue
+        args.set(9, (float) BlockUtilityConfig.Client.Outline.getAlpha() / 255); // alpha
     }
 }

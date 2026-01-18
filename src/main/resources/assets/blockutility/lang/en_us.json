@@ -11,6 +11,7 @@
   "blockutility.configuration.place_delay": "Custom Place Delay",
   "blockutility.configuration.break_delay": "Custom Break Delay",
   "blockutility.configuration.block_outline": "Block Outline",
+  "blockutility.configuration.optimal_tool_finder": "Optimal Tool Finder",
   "blockutility.configuration.enabled": "Enabled",
   "blockutility.configuration.width": "Width",
   "blockutility.configuration.alpha": "Alpha",

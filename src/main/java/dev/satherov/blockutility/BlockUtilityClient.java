@@ -3,8 +3,6 @@ package dev.satherov.blockutility;
 import lombok.Getter;
 import lombok.Setter;
 
-import dev.satherov.blockutility.config.BlockUtilityConfig;
-
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
