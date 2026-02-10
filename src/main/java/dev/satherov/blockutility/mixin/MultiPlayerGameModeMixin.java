@@ -77,19 +77,12 @@ public class MultiPlayerGameModeMixin {
             )
     )
     public void afterDestroyDelayDecrement(BlockPos posBlock, Direction directionFacing, CallbackInfoReturnable<Boolean> cir) {
+        if (Instant.now().isAfter(Instant.ofEpochSecond(BlockUtilityClient.getLast()).plusSeconds(2))) {
+            this.destroyDelay = 0;
+        }
+        
         BlockUtilityClient.setDelay(this.destroyDelay);
         BlockUtilityClient.setLast(Instant.now().getEpochSecond());
-    }
-    
-    @Inject(
-            method = "continueDestroyBlock",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"
-            )
-    )
-    public void modifyBreakDelay(BlockPos posBlock, Direction directionFacing, CallbackInfoReturnable<Boolean> cir) {
-        if (BlockUtilityClient.isCustomBreak()) this.destroyDelay = BlockUtilityConfig.Client.getBreakDelay();
     }
     
     @Inject(
@@ -108,8 +101,14 @@ public class MultiPlayerGameModeMixin {
                     )
             )
     )
-    public void setOptimalTool(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
-        if (BlockUtilityConfig.Client.isOptimalToolFinder()) {
+    public void onStartMiningNewBlock(BlockPos loc, Direction face, CallbackInfoReturnable<Boolean> cir) {
+        if (BlockUtilityClient.isCustomBreak()) {
+            this.destroyDelay = BlockUtilityConfig.Client.getBreakDelay();
+            BlockUtilityClient.setDelay(this.destroyDelay);
+            BlockUtilityClient.setLast(Instant.now().getEpochSecond());
+        }
+        
+        if (BlockUtilityClient.isOptimalToolFinder()) {
             Player player = minecraft.player;
             Level level = minecraft.level;
             HitResult hit = minecraft.hitResult;

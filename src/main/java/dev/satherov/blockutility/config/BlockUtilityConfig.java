@@ -40,10 +40,6 @@ public class BlockUtilityConfig {
         @ConfigVal.Boolean
         private static @Getter @Setter boolean infoDisplay = true;
         
-        @ConfigVal(name = "optimal_tool_finder", comment = "Automatically scroll to best tool in the hotbar for the current block")
-        @ConfigVal.Boolean
-        private static @Getter @Setter boolean optimalToolFinder = true;
-        
         @Config.Group("block_outline")
         public static class Outline {
             

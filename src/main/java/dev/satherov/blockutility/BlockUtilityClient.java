@@ -43,6 +43,7 @@ public class BlockUtilityClient {
     private static @Getter @Setter int delay = 0;
     private static @Getter @Setter long last = -1;
     
+    private static @Getter @Setter boolean optimalToolFinder = false;
     private static @Getter @Setter boolean customBreak = false;
     private static @Getter @Setter boolean customPlace = false;
     private static @Getter @Setter boolean directionLocked = false;
@@ -51,6 +52,7 @@ public class BlockUtilityClient {
     private static @Getter @Setter Direction.Axis lockedAxis = null;
     private static @Getter @Setter boolean placementActive = false;
     
+    private static final KeyMapping TOGGLE_OPTIMAL_TOOL_FINDER = new KeyMapping("key.blockutility.toggle_optimal_tool_finder", InputConstants.KEY_P, "key.category.blockutility");
     private static final KeyMapping TOGGLE_CUSTOM_BREAK = new KeyMapping("key.blockutility.toggle_custom_break", InputConstants.KEY_COMMA, "key.category.blockutility");
     private static final KeyMapping TOGGLE_CUSTOM_PLACE = new KeyMapping("key.blockutility.toggle_custom_place", InputConstants.KEY_PERIOD, "key.category.blockutility");
     private static final KeyMapping TOGGLE_DIRECTION_LOCK = new KeyMapping("key.blockutility.toggle_direction_lock", InputConstants.KEY_SLASH, "key.category.blockutility");
@@ -61,6 +63,7 @@ public class BlockUtilityClient {
     
     @SubscribeEvent
     private static void registerKeyBindings(final RegisterKeyMappingsEvent event) {
+        event.register(TOGGLE_OPTIMAL_TOOL_FINDER);
         event.register(TOGGLE_CUSTOM_BREAK);
         event.register(TOGGLE_CUSTOM_PLACE);
         event.register(TOGGLE_DIRECTION_LOCK);
@@ -75,6 +78,14 @@ public class BlockUtilityClient {
         
         if (!options.keyUse.isDown()) {
             BlockUtilityClient.reset();
+        }
+        
+        if (TOGGLE_OPTIMAL_TOOL_FINDER.consumeClick()) {
+            optimalToolFinder = !optimalToolFinder;
+            final String content = optimalToolFinder ? "message.blockutility.enabled" : "message.blockutility.disabled";
+            final ChatFormatting color = optimalToolFinder ? ChatFormatting.GREEN : ChatFormatting.RED;
+            Component message = Component.translatable(content).withStyle(color);
+            player.displayClientMessage(Component.translatable("message.blockutility.optimal_tool_finder", message), true);
         }
         
         if (TOGGLE_DIRECTION_LOCK.consumeClick()) {
@@ -113,7 +124,15 @@ public class BlockUtilityClient {
         Font font = mc.font;
         
         if (BlockUtilityConfig.Client.isInfoDisplay()) {
-            int displays = 0;
+            int displays = 1;
+            if (BlockUtilityClient.isOptimalToolFinder()) {
+                final Component key = ComponentUtils.wrapInSquareBrackets(Component.empty().append(TOGGLE_OPTIMAL_TOOL_FINDER.getTranslatedKeyMessage()).withStyle(ChatFormatting.GOLD));
+                final Component message = Component.translatable("message.blockutility.optimal_tool_finder", Component.translatable("message.blockutility.enabled").withStyle(ChatFormatting.GREEN))
+                        .append(Component.literal(" "))
+                        .append(Component.translatable("message.blockutility.toggle", key).withStyle(ChatFormatting.GRAY));
+                displays++;
+                graphics.drawString(font, message, 10, displays * (font.lineHeight + 1), 0xFFFFFF, true);
+            }
             if (BlockUtilityClient.isCustomBreak()) {
                 final Component key = ComponentUtils.wrapInSquareBrackets(Component.empty().append(TOGGLE_CUSTOM_BREAK.getTranslatedKeyMessage()).withStyle(ChatFormatting.GOLD));
                 final Component message = Component.translatable("message.blockutility.custom_break", Component.translatable("message.blockutility.enabled").withStyle(ChatFormatting.GREEN))
@@ -137,6 +156,9 @@ public class BlockUtilityClient {
                         .append(Component.translatable("message.blockutility.toggle", key).withStyle(ChatFormatting.GRAY));
                 displays++;
                 graphics.drawString(font, message, 10, displays * (font.lineHeight + 1), 0xFFFFFF, true);
+            }
+            if (displays > 1) {
+                graphics.drawString(font, Component.translatable("key.category.blockutility").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GOLD), 10, font.lineHeight, 0xFFFFFF, true);
             }
         }
         
